@@ -296,8 +296,22 @@ Trips %>%
   14. Change the graph from the previous problem to facet on `client` and fill with `weekday`. What information does this graph tell you that the previous didn't? Is one graph better than the other?
   
 ```{r}
-
+Trips %>% 
+  mutate(hour = hour(sdate),
+         minute = minute(sdate),
+         time = (hour + (minute/60)),
+         day_of_week = wday(sdate, label = TRUE),
+         type_day = ifelse(wday(sdate) %in% c(1,7), "weekend", "weekday")) %>% 
+  ggplot(aes(x = time, fill = type_day))+
+  facet_wrap(vars(client))+
+  geom_density(alpha = .5, position = position_stack())+
+   labs(title = "Distribution of Bike Rentals by Time of Day, Type of Day,
+        and Type of Client",
+       x = "",
+       y = "")
 ```
+
+> This graph facets on client and fills with weekday instead of faceting on weekday and filling with client type. The shape of these graphs are very similar, but the distribution underneath the density plot now tells a story about the difference in the type of day, and we can compare side by side distributions of the type of client. 
   
 ### Spatial patterns
 
@@ -307,20 +321,33 @@ Trips %>%
 Trips %>% 
   count(sstation) %>% 
   inner_join(Stations,
-             by = c("sstation" = "name"))
+             by = c("sstation" = "name")) %>% 
+  ggplot(aes(x = long, y = lat, color = n))+
+  geom_point()+
+  labs(title = "Total Number of Departures From Each Station
+       by Latitude and Longitude",
+       x = "longitude",
+       y = "latitude")
 ```
   
   16. Only 14.4% of the trips in our data are carried out by casual users. Create a plot that shows which area(s) have stations with a much higher percentage of departures by casual users. What patterns do you notice? (Again, we'll improve this next week when we learn about maps).
   
 ```{r}
 Trips %>% 
-  count(sstation) %>% 
+  group_by(sstation) %>% 
+  summarize(tot_dept = n(), 
+            prop_casual = mean(client == "Casual")) %>% 
   left_join(Stations,
-            by = c("sstations" = "name"))
-  mutate(prop_casual = mean(client == "Casual")) %>% 
-  ggplot(aes(x = lat, y = long))+
-  geom_point()
+            by = c("sstation" = "name")) %>% 
+  ggplot(aes(x = long, y = lat, color = prop_casual))+
+  geom_point()+
+  labs(title = "Areas With Stations with a Higher %
+  of Departures by Casual Users by Latitude and Longitude",
+       x = "longitude",
+       y = "latitude")
 ```
+
+> I notice that there is a cluster of points around -77.1 to -77.0 longitude and then a little cluster up around 39.1 latitude. Further, most of these points have a proportion less than 0.4 due to the dark shade of blue. 
   
 ### Spatiotemporal patterns
 
@@ -340,7 +367,8 @@ top_trip
 ```{r}
 Trips %>% 
   mutate(sdate = as_date(sdate)) %>% 
-  inner_join(top_trip, by = c("sstation", "sdate"))
+  inner_join(top_trip, 
+             by = c("sstation", "sdate"))
 ```
   
   19. Build on the code from the previous problem (ie. copy that code below and then %>% into the next step.) and group the trips by client type and day of the week (use the name, not the number). Find the proportion of trips by day within each client type (ie. the proportions for all 7 days within each client type add up to 1). Display your results so day of week is a column and there is a column for each client type. Interpret your results.
@@ -349,11 +377,17 @@ Trips %>%
 Trips %>% 
   mutate(sdate = as_date(sdate)) %>% 
   inner_join(top_trip, by = c("sstation", "sdate")) %>%
-  mutate(total = sum(count), prop = count/total) %>% 
+  mutate(day_of_week = wday(sdate, label = TRUE)) %>% 
+  group_by(client, day_of_week) %>% 
+  summarize(trips_day = n()) %>% 
+  group_by(client) %>% 
+  mutate(prop = trips_day/sum(trips_day)) %>% 
   pivot_wider(id_cols = day_of_week,
               names_from = client,
               values_from = prop)
 ```
+
+> For days of the weekend, the proportion of casual riders is greater than the proporion of registered riders. On the other hand, on weekdays except for Friday, which isn't measured above, the proportion of registered is greater. This can be explained by regular work commuters during the week compared to recreational fun on the weekends. 
 
 
 **DID YOU REMEMBER TO GO BACK AND CHANGE THIS SET OF EXERCISES TO THE LARGER DATASET? IF NOT, DO THAT NOW.**
@@ -361,11 +395,15 @@ Trips %>%
 ## GitHub link
 
   20. Below, provide a link to your GitHub page with this set of Weekly Exercises. Specifically, if the name of the file is 03_exercises.Rmd, provide a link to the 03_exercises.md file, which is the one that will be most readable on GitHub.
+  
+[](https://github.com/wbrazgel?tab=repositories)
 
 ## Challenge problem! 
 
 This problem uses the data from the Tidy Tuesday competition this week, `kids`. If you need to refresh your memory on the data, read about it [here](https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-09-15/readme.md). 
 
   21. In this exercise, you are going to try to replicate the graph below, created by Georgios Karamanis. I'm sure you can find the exact code on GitHub somewhere, but **DON'T DO THAT!** You will only be graded for putting an effort into this problem. So, give it a try and see how far you can get without doing too much googling. HINT: use `facet_geo()`. The graphic won't load below since it came from a location on my computer. So, you'll have to reference the original html on the moodle page to see it.
+  
+> I took time to examine the vizual but really struggled to understand where to even start. My finished product would not contain much of any of my own work but rather a lot of googling.
 
 **DID YOU REMEMBER TO UNCOMMENT THE OPTIONS AT THE TOP?**
