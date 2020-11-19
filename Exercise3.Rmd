@@ -387,7 +387,7 @@ Trips %>%
               values_from = prop)
 ```
 
-> For days of the weekend, the proportion of casual riders is greater than the proporion of registered riders. On the other hand, on weekdays except for Friday, which isn't measured above, the proportion of registered is greater. This can be explained by regular work commuters during the week compared to recreational fun on the weekends. 
+> For days of the weekend, the proportion of casual riders is greater than the proporion of registered riders. On the other hand, on weekdays except for Friday, which isn't measured above, the proportion of registered is greater. This can be explained by regular work commuters during the week compared  recreational fun on the weekends 
 
 
 **DID YOU REMEMBER TO GO BACK AND CHANGE THIS SET OF EXERCISES TO THE LARGER DATASET? IF NOT, DO THAT NOW.**
@@ -396,7 +396,7 @@ Trips %>%
 
   20. Below, provide a link to your GitHub page with this set of Weekly Exercises. Specifically, if the name of the file is 03_exercises.Rmd, provide a link to the 03_exercises.md file, which is the one that will be most readable on GitHub.
   
-[](https://github.com/wbrazgel?tab=repositories)
+[github link](https://github.com/wbrazgel/Exercise3)
 
 ## Challenge problem! 
 
